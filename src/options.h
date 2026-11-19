@@ -16,6 +16,7 @@ typedef struct {
     int bank;
     int program;
     int channel;
+    int velocity;
     double gain;
     bool list;
     bool presets;

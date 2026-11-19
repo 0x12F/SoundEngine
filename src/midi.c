@@ -36,7 +36,7 @@ int midi_list(void)
 
 int midi_open(Midi *m, const Options *o)
 {
-    *m = (Midi){ .channel = o->channel };
+    *m = (Midi){ .channel = o->channel, .velocity = o->velocity };
     int error = snd_seq_open(&m->seq, "default", SND_SEQ_OPEN_INPUT, SND_SEQ_NONBLOCK);
     if (error < 0) goto fail;
     error = snd_seq_set_client_name(m->seq, "M1 Sound Engine");
@@ -126,6 +126,9 @@ int midi_read(Midi *m, EventQueue *queue)
         if (!valid || (m->channel && event.channel != m->channel - 1)) continue;
         if (event.type == CONTROL && (event.key == BANK_MSB || event.key == BANK_LSB))
             continue;
+        /* A zero-velocity note-on is a release, even with fixed velocity. */
+        if (m->velocity && event.type == NOTE_ON && event.value)
+            event.value = m->velocity;
         queue_push(queue, event);
     }
     return 0;

@@ -57,6 +57,33 @@ int main(void)
         assert(received.value == expected[n].value);
     }
     assert(!queue_pop(&queue, &received));
+    midi_close(&midi);
+    options.velocity = 100;
+    assert(midi_open(&midi, &options) == 0);
+    const snd_seq_event_t fixed_events[] = {
+        {.type = SND_SEQ_EVENT_NOTEON, .data.note = {.channel = 0, .note = 60, .velocity = 16}},
+        {.type = SND_SEQ_EVENT_NOTEON, .data.note = {.channel = 0, .note = 64, .velocity = 99}},
+        {.type = SND_SEQ_EVENT_NOTEON, .data.note = {.channel = 0, .note = 60, .velocity = 0}},
+        {.type = SND_SEQ_EVENT_NOTEOFF, .data.note = {.channel = 0, .note = 64, .velocity = 32}},
+        {.type = SND_SEQ_EVENT_CONTROLLER, .data.control = {.channel = 0, .param = 11, .value = 48}},
+        {.type = SND_SEQ_EVENT_KEYPRESS, .data.note = {.channel = 0, .note = 64, .velocity = 24}}
+    };
+    const Event fixed_expected[] = {
+        {NOTE_ON, 0, 60, 100}, {NOTE_ON, 0, 64, 100},
+        {NOTE_ON, 0, 60, 0}, {NOTE_OFF, 0, 64, 32},
+        {CONTROL, 0, 11, 48}, {KEY_PRESSURE, 0, 64, 24}
+    };
+    for (size_t n = 0; n < sizeof fixed_events / sizeof fixed_events[0]; ++n)
+        send_event(source, port, &midi, fixed_events[n]);
+    assert(midi_read(&midi, &queue) == 0);
+    for (size_t n = 0; n < sizeof fixed_expected / sizeof fixed_expected[0]; ++n) {
+        assert(queue_pop(&queue, &received));
+        assert(received.type == fixed_expected[n].type);
+        assert(received.channel == fixed_expected[n].channel);
+        assert(received.key == fixed_expected[n].key);
+        assert(received.value == fixed_expected[n].value);
+    }
+    assert(!queue_pop(&queue, &received));
     assert(snd_seq_disconnect_from(midi.seq, midi.port, snd_seq_client_id(source), port) >= 0);
     assert(midi_read(&midi, &queue) == 0);
     assert(atomic_load(&queue.panic));

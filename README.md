@@ -24,5 +24,9 @@ Replace the MIDI and audio numbers with those from `--list`, and choose bank and
 program numbers from `--presets`. Omit `--audio` to use your default output.
 Press Ctrl-C to stop. Restore LOCAL to On when playing without the PC.
 
+For organ playing, add `--velocity 100` to give every note a consistent strike
+velocity. The default (`--velocity 0`) follows how hard you play each key.
+Fixed velocity does not equalize differences between pitches or SoundFont samples.
+
 Run `./build/m1 --help` for all options or `make test` to run tests (requires Python 3).
 

@@ -16,6 +16,7 @@ void options_usage(const char *name)
            "  --bank N              SoundFont bank (default: 0)\n"
            "  --program N           SoundFont program, 0..127 (default: 0)\n"
            "  --channel N           Listen to 1..16, or 0 for all (default: 0)\n"
+           "  --velocity N          Fixed note velocity, 1..127; 0 uses touch (default: 0)\n"
            "  --rate HZ             Sample rate (default: 48000)\n"
            "  --buffer FRAMES       Callback size (default: 128)\n"
            "  --polyphony N         Sample voices (default: 256)\n"
@@ -63,6 +64,7 @@ int options_parse(Options *o, int argc, char **argv)
                 {"--bank", &o->bank, 0, 16383},
                 {"--program", &o->program, 0, M1_MIDI_MAX},
                 {"--channel", &o->channel, 0, M1_CHANNELS},
+                {"--velocity", &o->velocity, 0, M1_MIDI_MAX},
                 {"--rate", &o->sample_rate, 8000, 192000},
                 {"--buffer", &o->buffer_frames, 32, 4096},
                 {"--polyphony", &o->polyphony, 1, 4096}

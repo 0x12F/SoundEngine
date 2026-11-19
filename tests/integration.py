@@ -59,7 +59,7 @@ with tempfile.TemporaryDirectory(prefix='m1-test-') as directory:
     assert 'Test sine' in run('./build/m1', '--soundfont', str(font), '--presets').stdout
     for rate in (44100, 48000):
         run('./build/m1', '--soundfont', str(font), '--render', str(output),
-            '--rate', str(rate), '--dry')
+            '--rate', str(rate), '--dry', '--velocity', '100')
         with wave.open(str(output), 'rb') as audio:
             assert (audio.getnchannels(), audio.getsampwidth(), audio.getframerate(),
                     audio.getnframes()) == (2, 2, rate, rate * 5)
@@ -71,7 +71,8 @@ with tempfile.TemporaryDirectory(prefix='m1-test-') as directory:
             assert max(abs(x) for x in attack) > 100
             assert max(abs(x) for x in tail) < 10
     for flag, value in [('--rate', 'bad'), ('--program', '128'), ('--channel', '17'),
-                        ('--buffer', '0'), ('--gain', 'nan'), ('--gain', '0.3junk')]:
+                        ('--buffer', '0'), ('--velocity', '-1'), ('--velocity', '128'),
+                        ('--gain', 'nan'), ('--gain', '0.3junk')]:
         run('./build/m1', '--soundfont', str(font), flag, value, success=False)
     run('./build/m1', '--soundfont', str(font), '--program', '1',
         '--render', str(output), success=False)

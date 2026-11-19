@@ -5,7 +5,7 @@
 #include "options.h"
 #include <alsa/asoundlib.h>
 
-typedef struct { snd_seq_t *seq; int port; int channel; } Midi;
+typedef struct { snd_seq_t *seq; int port; int channel; int velocity; } Midi;
 
 int midi_list(void);
 int midi_open(Midi *midi, const Options *options);
